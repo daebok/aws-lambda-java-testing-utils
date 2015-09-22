@@ -1,0 +1,38 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.8
+version = '1.0'
+group = 'uk.co.bbc.pcs'
+
+repositories {
+    mavenCentral()
+}
+
+project.ext {
+    awsLambdaJavaEventsVersion = "1.1.0"
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile 'org.slf4j:slf4j-log4j12:1.7.12'
+    compile 'com.amazonaws:aws-lambda-java-core:1.0.0'
+    compile 'com.amazonaws:aws-java-sdk-core:1.8.10.2'
+    compile 'com.sparkjava:spark-core:2.3'
+    compile 'com.google.guava:guava:18.0'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.6.2'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.6.2'
+    compile  "com.amazonaws:aws-lambda-java-events:${awsLambdaJavaEventsVersion}"
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'com.jayway.restassured:rest-assured:2.5.0'
+
+}
+
+task fatJar(type: Jar) {
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+build.dependsOn fatJar
