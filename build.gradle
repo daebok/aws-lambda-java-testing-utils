@@ -1,38 +1,70 @@
-apply plugin: 'java'
-apply plugin: 'maven'
+plugins {
+    id 'java'
+    id 'maven'
+    id 'net.researchgate.release' version '2.2.2'
+}
 
-sourceCompatibility = 1.8
-version = '1.0'
-group = 'uk.co.bbc.pcs'
+archivesBaseName = 'aws-lambda-java-testing-utils'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+
 project.ext {
+    slf4jVersion = "1.7.12"
     awsLambdaJavaEventsVersion = "1.1.0"
+    jacksonVersion = "2.6.2"
+}
+
+configurations {
+    deployerJars
 }
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.12'
-    compile 'org.slf4j:slf4j-log4j12:1.7.12'
+    compile "org.slf4j:slf4j-api:${slf4jVersion}"
+    compile "org.slf4j:slf4j-log4j12:${slf4jVersion}"
     compile 'com.amazonaws:aws-lambda-java-core:1.0.0'
     compile 'com.amazonaws:aws-java-sdk-core:1.8.10.2'
     compile 'com.sparkjava:spark-core:2.3'
     compile 'com.google.guava:guava:18.0'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.6.2'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.6.2'
-    compile  "com.amazonaws:aws-lambda-java-events:${awsLambdaJavaEventsVersion}"
+    compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+    compile "com.amazonaws:aws-lambda-java-events:${awsLambdaJavaEventsVersion}"
 
     testCompile 'junit:junit:4.11'
     testCompile 'com.jayway.restassured:rest-assured:2.5.0'
 
+    deployerJars "org.apache.maven.wagon:wagon-ssh-external:2.9"
 }
 
-task fatJar(type: Jar) {
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+// Maven Release
+release {
+    tagTemplate = '$name-$version'
 }
 
-build.dependsOn fatJar
+task(startmessage) << {
+    println 'starting build'
+}
+
+task(printversion) << {
+    println project.version
+}
+
+beforeReleaseBuild.dependsOn startmessage
+afterReleaseBuild.dependsOn printversion
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "2.5"
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        configuration = configurations.deployerJars
+        repository(url: "scpexe://repo503.back.test.bc.local/data/dev.bbc.co.uk/maven2/releases")
+    }
+}
