@@ -25,6 +25,8 @@ public class SparkRouter {
         Spark.port(port);
         Spark.get("/", (request, response) -> "AWS Lambda Runner Java");
         Spark.post("/", this::forwardRequest);
+
+        Spark.awaitInitialization();
         logger.info("Started server at port {}", port);
     }
 
