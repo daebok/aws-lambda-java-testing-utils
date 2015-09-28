@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 public class ReflectionUtils {
     private static Logger logger = LoggerFactory.getLogger(ReflectionUtils.class);
@@ -35,30 +36,21 @@ public class ReflectionUtils {
         }
     }
 
-    public static Class<?> getMethodReturnType(Class<?> cls, String methodName) {
-        Method method = getMethod(cls, methodName);
-        Class<?> returnType = method.getReturnType();
-        logger.debug("{}::{} has return type {}", cls.getName(), methodName, returnType.getName());
-        return returnType;
+    public static Type getMethodGenericParameterType(Object instance, String methodName, int parameterIndex) {
+        Method method = getMethod(instance, methodName);
+        return method.getGenericParameterTypes()[parameterIndex];
     }
 
-    public static Class<?> getMethodParameterType(Class<?> cls, String methodName, int parameterIndex) {
-        Method method = getMethod(cls, methodName);
-        Class<?> parameterType = method.getParameterTypes()[parameterIndex];
-        logger.debug("{}::{} has parameter type {} at position {}", cls.getName(), methodName, parameterType.getName(), parameterIndex);
-        return parameterType;
-    }
-
-    private static Method getMethod(Class<?> cls, String methodName) {
-        for (Method method : cls.getMethods()) {
+    private static Method getMethod(Object instance, String methodName) {
+        for (Method method : instance.getClass().getDeclaredMethods()) {
             if (!method.getName().equals(methodName)) {
                 continue;
             }
             return method;
         }
 
-        String message = String.format("%s does not implement method %s", cls.getName(), methodName);
-        logger.error(message);
+        String message = String.format("%s does not implement method %s", instance.getClass().getName(), methodName);
+        logger.info(message);
         throw new RuntimeException(message);
     }
 

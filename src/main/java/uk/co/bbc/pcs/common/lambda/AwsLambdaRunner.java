@@ -1,5 +1,6 @@
 package uk.co.bbc.pcs.common.lambda;
 
+import com.amazonaws.services.lambda.runtime.RequestHandler;
 import uk.co.bbc.pcs.common.lambda.forwarder.RequestForwarder;
 import uk.co.bbc.pcs.common.lambda.forwarder.RequestHandlerForwarder;
 import org.slf4j.Logger;
@@ -13,8 +14,15 @@ public class AwsLambdaRunner {
     private static SparkRouter router;
 
     public static void main (String[] args) {
-        RequestForwarder requestForwarder = getRequestForwarder(args);
-        startServer(requestForwarder);
+        if (args.length == 0 ) {
+            String message = "RequestHandler class name must be passed in as an argument";
+            logger.error(message);
+            throw new RuntimeException(message);
+        }
+
+        String className = args[0];
+        RequestHandler requestHandler = ReflectionUtils.instantiateClassImplementing(className, RequestHandler.class);
+        startServer(requestHandler);
     }
 
     public static void stopServer() {
@@ -23,22 +31,15 @@ public class AwsLambdaRunner {
         }
     }
 
+    public static void startServer(RequestHandler requestHandler) {
+        RequestForwarder requestForwarder = new RequestHandlerForwarder(requestHandler);
+        startServer(requestForwarder);
+    }
+
     private static void startServer(RequestForwarder requestForwarder) {
         SparkConfig config = new SparkConfig();
         router = new SparkRouter(config, requestForwarder);
         router.start();
     }
-
-    private static RequestForwarder getRequestForwarder(String[] args) {
-        if (args.length == 0 ) {
-            String message = "RequestHandler class name must be passed in as an argument";
-            logger.error(message);
-            throw new RuntimeException(message);
-        }
-
-        String className = args[0];
-        return new RequestHandlerForwarder(className);
-    }
-
 
 }

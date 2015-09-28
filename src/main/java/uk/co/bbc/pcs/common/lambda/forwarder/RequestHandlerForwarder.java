@@ -13,6 +13,7 @@ import uk.co.bbc.pcs.common.lambda.jackson.AwsLambdaEventsObjectMapper;
 import uk.co.bbc.pcs.common.lambda.mock.MockContextBuilder;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
@@ -25,13 +26,13 @@ public class RequestHandlerForwarder implements RequestForwarder {
     private static final String HANDLE_REQUEST_METHOD_NAME = "handleRequest";
 
     private final RequestHandler requestHandler;
-    private final Class<?> requestType;
+    private final Type requestType;
     private final ObjectMapper objectMapper;
 
-    public RequestHandlerForwarder(String className) {
-        this.requestHandler = ReflectionUtils.instantiateClassImplementing(className, RequestHandler.class);
-        this.requestType = ReflectionUtils.getMethodParameterType(requestHandler.getClass(), HANDLE_REQUEST_METHOD_NAME, 0);
-
+    public RequestHandlerForwarder(RequestHandler requestHandler) {
+        this.requestHandler = requestHandler;
+        this.requestType = ReflectionUtils.getMethodGenericParameterType(requestHandler, HANDLE_REQUEST_METHOD_NAME, 0);
+        logger.info("Got {} request type for request handler {}", requestType, requestHandler);
         objectMapper = new AwsLambdaEventsObjectMapper();
     }
 
@@ -55,7 +56,8 @@ public class RequestHandlerForwarder implements RequestForwarder {
     }
 
     private Object parseRequestBody(String rawRequestBody) throws JSONException, IOException {
-        return objectMapper.readValue(rawRequestBody, requestType);
+        logger.info("Parsing request body to {}", requestType);
+        return objectMapper.readValue(rawRequestBody, objectMapper.getTypeFactory().constructType(requestType));
     }
 
 }
