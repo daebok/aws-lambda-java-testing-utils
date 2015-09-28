@@ -3,9 +3,6 @@ package uk.co.bbc.pcs.common.lambda;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-
 public class ReflectionUtils {
     private static Logger logger = LoggerFactory.getLogger(ReflectionUtils.class);
 
@@ -36,22 +33,14 @@ public class ReflectionUtils {
         }
     }
 
-    public static Type getMethodGenericParameterType(Object instance, String methodName, int parameterIndex) {
-        Method method = getMethod(instance, methodName);
-        return method.getGenericParameterTypes()[parameterIndex];
-    }
-
-    private static Method getMethod(Object instance, String methodName) {
-        for (Method method : instance.getClass().getDeclaredMethods()) {
-            if (!method.getName().equals(methodName)) {
-                continue;
-            }
-            return method;
+    public static Class<?> resolveClass(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            String message = String.format("Could not resolve class: %s", className);
+            logger.error(message, e);
+            throw new RuntimeException(message, e);
         }
-
-        String message = String.format("%s does not implement method %s", instance.getClass().getName(), methodName);
-        logger.info(message);
-        throw new RuntimeException(message);
     }
 
 }

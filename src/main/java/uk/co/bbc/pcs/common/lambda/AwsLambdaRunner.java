@@ -14,15 +14,19 @@ public class AwsLambdaRunner {
     private static SparkRouter router;
 
     public static void main (String[] args) {
-        if (args.length == 0 ) {
-            String message = "RequestHandler class name must be passed in as an argument";
+        if (args.length < 2) {
+            String message = "RequestHandler and event type class names must be passed in as an argument";
             logger.error(message);
             throw new RuntimeException(message);
         }
 
         String className = args[0];
         RequestHandler requestHandler = ReflectionUtils.instantiateClassImplementing(className, RequestHandler.class);
-        startServer(requestHandler);
+
+        String eventClassName = args[1];
+        Class<?> eventClass = ReflectionUtils.resolveClass(eventClassName);
+
+        startServer(requestHandler, eventClass);
     }
 
     public static void stopServer() {
@@ -31,8 +35,8 @@ public class AwsLambdaRunner {
         }
     }
 
-    public static void startServer(RequestHandler requestHandler) {
-        RequestForwarder requestForwarder = new RequestHandlerForwarder(requestHandler);
+    public static void startServer(RequestHandler requestHandler, Class<?> eventClass) {
+        RequestForwarder requestForwarder = new RequestHandlerForwarder(requestHandler, eventClass);
         startServer(requestForwarder);
     }
 

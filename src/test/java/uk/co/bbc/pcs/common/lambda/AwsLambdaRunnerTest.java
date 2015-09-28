@@ -32,7 +32,8 @@ public class AwsLambdaRunnerTest {
     @Test(expected=RuntimeException.class)
     public void mainShouldThrowExceptionIfNonRequestHandlerClassName() {
         String[] args = {
-                "java.lang.System"
+                "java.lang.System",
+                DynamodbEvent.class.getName()
         };
         AwsLambdaRunner.main(args);
     }
@@ -40,7 +41,8 @@ public class AwsLambdaRunnerTest {
     @Test(expected=RuntimeException.class)
     public void mainShouldThrowExceptionIfClassDoesNotExist() {
         String[] args = {
-                "not.existing.class"
+                "not.existing.class",
+                DynamodbEvent.class.getName()
         };
         AwsLambdaRunner.main(args);
     }
@@ -54,7 +56,8 @@ public class AwsLambdaRunnerTest {
     @Test
     public void mainShouldStartServerIfRequestHandlerPassedIn() {
         String[] args = {
-                MockHandler.class.getName()
+                MockHandler.class.getName(),
+                DynamodbEvent.class.getName()
         };
         AwsLambdaRunner.main(args);
         given()
@@ -68,7 +71,8 @@ public class AwsLambdaRunnerTest {
     @Test
     public void mainShouldForwardToDynamoDbEventRequestHandler() throws IOException {
         String[] args = {
-                MockHandler.class.getName()
+                MockHandler.class.getName(),
+                DynamodbEvent.class.getName()
         };
         AwsLambdaRunner.main(args);
 

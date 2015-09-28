@@ -5,15 +5,12 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.util.json.JSONException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.co.bbc.pcs.common.lambda.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.co.bbc.pcs.common.lambda.jackson.AwsLambdaEventsObjectMapper;
 import uk.co.bbc.pcs.common.lambda.mock.MockContextBuilder;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
@@ -23,16 +20,14 @@ public class RequestHandlerForwarder implements RequestForwarder {
 
     private static Logger logger = LoggerFactory.getLogger(RequestHandlerForwarder.class);
 
-    private static final String HANDLE_REQUEST_METHOD_NAME = "handleRequest";
-
     private final RequestHandler requestHandler;
-    private final Type requestType;
+    private final Class<?> eventClass;
     private final ObjectMapper objectMapper;
 
-    public RequestHandlerForwarder(RequestHandler requestHandler) {
+    public RequestHandlerForwarder(RequestHandler requestHandler, Class<?> eventClass) {
         this.requestHandler = requestHandler;
-        this.requestType = ReflectionUtils.getMethodGenericParameterType(requestHandler, HANDLE_REQUEST_METHOD_NAME, 0);
-        logger.info("Got {} request type for request handler {}", requestType, requestHandler);
+        this.eventClass = eventClass;
+        logger.info("Got {} event type for request handler {}", eventClass, requestHandler);
         objectMapper = new AwsLambdaEventsObjectMapper();
     }
 
@@ -56,8 +51,7 @@ public class RequestHandlerForwarder implements RequestForwarder {
     }
 
     private Object parseRequestBody(String rawRequestBody) throws JSONException, IOException {
-        logger.info("Parsing request body to {}", requestType);
-        return objectMapper.readValue(rawRequestBody, objectMapper.getTypeFactory().constructType(requestType));
+        return objectMapper.readValue(rawRequestBody, objectMapper.getTypeFactory().constructType(eventClass));
     }
 
 }
