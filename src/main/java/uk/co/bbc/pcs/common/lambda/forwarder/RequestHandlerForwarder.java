@@ -45,7 +45,8 @@ public class RequestHandlerForwarder implements RequestForwarder {
 
     @SuppressWarnings("unchecked")
     private String forwardToRequestHandler(Object request) throws JsonProcessingException {
-        Context context = new MockContextBuilder(requestHandler.getClass().getName()).createMockContext();
+        Context context = new MockContextBuilder(requestHandler.getClass().getName(), logger::info)
+                .createMockContext();
         Object response = requestHandler.handleRequest(request, context);
         return objectMapper.writeValueAsString(response);
     }

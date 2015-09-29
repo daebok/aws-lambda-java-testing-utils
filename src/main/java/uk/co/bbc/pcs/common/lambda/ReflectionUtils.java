@@ -19,14 +19,14 @@ public class ReflectionUtils {
     @SuppressWarnings("unchecked")
     public static <T> T instantiateClassImplementing(String className, Class<T> targetInterface) {
         try {
-            Class<?> resolvedClass = Class.forName(className);
+            Class<?> resolvedClass = resolveClass(className);
             if (!targetInterface.isAssignableFrom(resolvedClass)) {
                 String message = String.format("%s is not assignable from %s", targetInterface.getName(), resolvedClass.getName());
                 logger.error(message);
                 throw new RuntimeException(message);
             }
             return ((Class<T>) resolvedClass).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             String message = String.format("Could not instantiate class: %s", className);
             logger.error(message, e);
             throw new RuntimeException(message, e);
