@@ -86,6 +86,20 @@ public class AwsLambdaRunnerTest {
 
     }
 
+    @Test
+    public void mainShouldForwardToDynamoDbEventRequestHandlerWhenStartedFromJava() throws IOException {
+        AwsLambdaRunner.startServer(new MockHandler(), DynamodbEvent.class);
+
+        given()
+                .port(PORT)
+                .body(readFile("/dynamodb-event.json"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200);
+
+    }
+
     public static class MockHandler implements RequestHandler<DynamodbEvent, String>{
         @Override
         public String handleRequest(DynamodbEvent event, Context context) {
