@@ -4,15 +4,20 @@ This library contains some useful classes for testing AWS Lambda Java components
 ## AwsLambdaRunner
 This class will start a HTTP server which forwards messages to a Lambda component. 
 Currently it can only forward messages to components which implement `com.amazonaws.services.lambda.runtime.RequestHandler`.
+By default, it will start the server on port 8080. It can be changed by setting system property `port`.
 
 ### Usage - Gradle
 The simplest usage would be to add a task to your Gradle build file as follows:
 
 ```groovy
 
+configurations {
+    lambdaTestJars
+}
+
 dependencies {
   compile 'com.amazonaws:aws-lambda-java-core:1.0.0' // Contains the RequestHandler class
-  testCompile "uk.co.bbc.pcs.common:aws-lambda-java-testing-utils:1-SNAPSHOT"
+  lambdaTestJars "uk.co.bbc.pcs.common:aws-lambda-java-testing-utils:1-SNAPSHOT"
 }
 
 /**
@@ -22,7 +27,8 @@ task runLambda(dependsOn: 'classes', type: JavaExec) {
   main = 'uk.co.bbc.pcs.common.lambda.AwsLambdaRunner'
   args = ['<Full class name of your RequestHandler>',
           '<Full class name of the event>']
-  classpath=sourceSets.test.runtimeClasspath
+    classpath=configurations.cucumberTestJars
+    classpath+=[sourceSets.test.runtimeClasspath]
 }
 ```
 
