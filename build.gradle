@@ -17,29 +17,34 @@ targetCompatibility = 1.8
 
 project.ext {
     slf4jVersion = "1.7.12"
+    awsLambdaJavaCoreVersion = "1.0.0"
     awsLambdaJavaEventsVersion = "1.1.0"
+    awsSdkVersion = "1.10.22"
     jacksonVersion = "2.6.2"
 }
 
 configurations {
     deployerJars
+    provided
+    compile.extendsFrom provided
 }
 
 dependencies {
     compile "org.slf4j:slf4j-api:${slf4jVersion}"
     compile "org.slf4j:slf4j-log4j12:${slf4jVersion}"
-    compile 'com.amazonaws:aws-lambda-java-core:1.0.0'
-    compile 'com.amazonaws:aws-java-sdk-core:1.8.10.2'
     compile 'com.sparkjava:spark-core:2.3'
     compile 'com.google.guava:guava:18.0'
     compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
     compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
-    compile "com.amazonaws:aws-lambda-java-events:${awsLambdaJavaEventsVersion}"
 
     testCompile 'junit:junit:4.11'
     testCompile 'com.jayway.restassured:rest-assured:2.5.0'
 
     deployerJars "org.apache.maven.wagon:wagon-ssh-external:2.9"
+
+    provided "com.amazonaws:aws-lambda-java-core:${awsLambdaJavaCoreVersion}"
+    provided "com.amazonaws:aws-lambda-java-events:${awsLambdaJavaEventsVersion}"
+    provided "com.amazonaws:aws-java-sdk-core:${awsSdkVersion}"
 }
 
 // Maven Release
