@@ -17,6 +17,8 @@ configurations {
 
 dependencies {
   compile 'com.amazonaws:aws-lambda-java-core:1.0.0' // Contains the RequestHandler class
+  compile "com.amazonaws:aws-lambda-java-events:1.1.0" // Contains the AWS Lambda event classes
+
   lambdaTestJars "uk.co.bbc.pcs.common:aws-lambda-java-testing-utils:1-SNAPSHOT"
 }
 
