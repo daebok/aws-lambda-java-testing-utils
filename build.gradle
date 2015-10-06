@@ -7,8 +7,7 @@ plugins {
 archivesBaseName = 'aws-lambda-java-testing-utils'
 
 repositories {
-    mavenCentral()
-    mavenLocal()
+    maven { url 'https://dev.bbc.co.uk/artifactory/repo' }
 }
 
 sourceCompatibility = 1.8
