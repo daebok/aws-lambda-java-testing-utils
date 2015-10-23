@@ -3,6 +3,7 @@ package uk.co.bbc.pcs.common.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent;
+import com.amazonaws.services.lambda.runtime.events.SNSEvent;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import org.junit.After;
@@ -56,7 +57,7 @@ public class AwsLambdaRunnerTest {
     @Test
     public void mainShouldStartServerIfRequestHandlerPassedIn() {
         String[] args = {
-                MockHandler.class.getName(),
+                DynamodbMockHandler.class.getName(),
                 DynamodbEvent.class.getName()
         };
         AwsLambdaRunner.main(args);
@@ -71,7 +72,7 @@ public class AwsLambdaRunnerTest {
     @Test
     public void mainShouldForwardToDynamoDbEventRequestHandler() throws IOException {
         String[] args = {
-                MockHandler.class.getName(),
+                DynamodbMockHandler.class.getName(),
                 DynamodbEvent.class.getName()
         };
         AwsLambdaRunner.main(args);
@@ -88,7 +89,7 @@ public class AwsLambdaRunnerTest {
 
     @Test
     public void mainShouldForwardToDynamoDbEventRequestHandlerWhenStartedFromJava() throws IOException {
-        AwsLambdaRunner.startServer(new MockHandler(), DynamodbEvent.class);
+        AwsLambdaRunner.startServer(new DynamodbMockHandler(), DynamodbEvent.class);
 
         given()
                 .port(PORT)
@@ -100,11 +101,35 @@ public class AwsLambdaRunnerTest {
 
     }
 
-    public static class MockHandler implements RequestHandler<DynamodbEvent, String>{
+    @Test
+    public void mainShouldForwardToSnsEventRequestHandlerWhenStartedFromJava() throws IOException {
+        AwsLambdaRunner.startServer(new SNSMockHandler(), SNSEvent.class);
+
+        given()
+                .port(PORT)
+                .body(readFile("/sns-event.json"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200);
+
+    }
+
+    public static class DynamodbMockHandler implements RequestHandler<DynamodbEvent, String> {
         @Override
         public String handleRequest(DynamodbEvent event, Context context) {
             List<DynamodbEvent.DynamodbStreamRecord> records = event.getRecords();
             DynamodbEvent.DynamodbStreamRecord record = records.get(0);
+            context.getLogger().log(record.toString());
+            return "Received event";
+        }
+    }
+
+    public static class SNSMockHandler implements RequestHandler<SNSEvent, String> {
+        @Override
+        public String handleRequest(SNSEvent event, Context context) {
+            List<SNSEvent.SNSRecord> records = event.getRecords();
+            SNSEvent.SNSRecord record = records.get(0);
             context.getLogger().log(record.toString());
             return "Received event";
         }
