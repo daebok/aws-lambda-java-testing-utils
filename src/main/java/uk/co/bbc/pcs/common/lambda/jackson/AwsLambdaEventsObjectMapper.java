@@ -20,5 +20,6 @@ public class AwsLambdaEventsObjectMapper extends ObjectMapper {
 
         DynamodbEventMixIns.addMixIns(this);
         SNSEventMixIns.addMixIns(this);
+        S3EventMixins.addMixIns(this);
     }
 }

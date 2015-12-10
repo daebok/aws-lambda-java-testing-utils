@@ -3,7 +3,9 @@ package uk.co.bbc.pcs.common.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent;
+import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent;
+import com.amazonaws.services.s3.event.S3EventNotification;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import org.junit.After;
@@ -115,6 +117,20 @@ public class AwsLambdaRunnerTest {
 
     }
 
+    @Test
+    public void mainShouldForwardToS3EventRequestHandlerWhenStartedFromJava() throws IOException {
+        AwsLambdaRunner.startServer(new S3MockHandler(), S3Event.class);
+
+        given()
+                .port(PORT)
+                .body(readFile("/s3-event.json"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200);
+
+    }
+
     public static class DynamodbMockHandler implements RequestHandler<DynamodbEvent, String> {
         @Override
         public String handleRequest(DynamodbEvent event, Context context) {
@@ -134,6 +150,17 @@ public class AwsLambdaRunnerTest {
             return "Received event";
         }
     }
+
+    public static class S3MockHandler implements RequestHandler<S3Event, String> {
+        @Override
+        public String handleRequest(S3Event event, Context context) {
+            List<S3EventNotification.S3EventNotificationRecord> records = event.getRecords();
+            S3EventNotification.S3EventNotificationRecord record = records.get(0);
+            context.getLogger().log(record.toString());
+            return "Received event";
+        }
+    }
+
 
     private String readFile(String filename) throws IOException {
         URL url = getClass().getResource(filename);
