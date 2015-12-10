@@ -11,10 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
-/**
- * MixIns for mapping com.amazonaws.services.lambda.runtime.events.DynamodbEvent
- * See http://wiki.fasterxml.com/JacksonMixInAnnotations for details about MixIns.
- */
 public class DynamodbEventMixIns {
 
     public static void addMixIns(ObjectMapper objectMapper) {
