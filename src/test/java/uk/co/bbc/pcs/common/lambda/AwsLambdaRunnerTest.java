@@ -125,7 +125,7 @@ public class AwsLambdaRunnerTest {
 
 
     @Test
-    public void should() throws IOException {
+    public void mainShouldForwardToSesEventRequestHandlerWhenStartedFromJava() throws IOException {
         AwsLambdaRunner.startServer(new SESMockHandler(), LinkedHashMap.class);
 
         String subject = "Test Subject";
