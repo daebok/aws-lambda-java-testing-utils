@@ -8,10 +8,6 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * MixIns for mapping com.amazonaws.services.lambda.runtime.events.SNSEvent
- * See http://wiki.fasterxml.com/JacksonMixInAnnotations for details about MixIns.
- */
 public class SNSEventMixIns {
 
     public static void addMixIns(ObjectMapper objectMapper) {

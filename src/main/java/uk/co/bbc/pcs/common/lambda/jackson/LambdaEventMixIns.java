@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generic Lambda event mix ins
+ * Generic Lambda event MixIns
  */
 public class LambdaEventMixIns {
 

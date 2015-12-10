@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 public class AwsLambdaEventsObjectMapper extends ObjectMapper {
 
 
+
     public AwsLambdaEventsObjectMapper() {
         super();
 
@@ -18,6 +19,8 @@ public class AwsLambdaEventsObjectMapper extends ObjectMapper {
 
         this.registerModule(new JodaModule());
 
+        // Adds MixIns for Lambda event objects
+        // See http://wiki.fasterxml.com/JacksonMixInAnnotations for details about MixIns.
         DynamodbEventMixIns.addMixIns(this);
         SNSEventMixIns.addMixIns(this);
         S3EventMixins.addMixIns(this);
