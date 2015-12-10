@@ -6,6 +6,8 @@ import com.amazonaws.services.lambda.runtime.events.DynamodbEvent;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent;
 import com.amazonaws.services.s3.event.S3EventNotification;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import org.junit.After;
@@ -14,13 +16,17 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.jayway.restassured.RestAssured.given;
+import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class AwsLambdaRunnerTest {
 
     private static final int PORT = 1234;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Before
     public void setUp() {
@@ -117,6 +123,25 @@ public class AwsLambdaRunnerTest {
 
     }
 
+
+    @Test
+    public void should() throws IOException {
+        AwsLambdaRunner.startServer(new SESMockHandler(), LinkedHashMap.class);
+
+        String subject = "Test Subject";
+        String sesEvent = readFile("/ses-event.json").replaceAll("%%SUBJECT%%", subject);
+
+        given()
+                .port(PORT)
+                .body(sesEvent)
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200)
+                .assertThat().body(equalTo("\"" + subject + "\""));
+    }
+
+
     @Test
     public void mainShouldForwardToS3EventRequestHandlerWhenStartedFromJava() throws IOException {
         AwsLambdaRunner.startServer(new S3MockHandler(), S3Event.class);
@@ -148,6 +173,25 @@ public class AwsLambdaRunnerTest {
             SNSEvent.SNSRecord record = records.get(0);
             context.getLogger().log(record.toString());
             return "Received event";
+        }
+    }
+
+    public static class SESMockHandler implements RequestHandler<LinkedHashMap<String, Object>, String> {
+        @Override
+        public String handleRequest(LinkedHashMap<String, Object> sesEvent, Context context) {
+
+            try {
+                String sesMessage = OBJECT_MAPPER.writeValueAsString(sesEvent);
+                JsonNode sesMessageNode = OBJECT_MAPPER.readValue(sesMessage, JsonNode.class);
+                String subject = sesMessageNode.findValue("subject").asText();
+
+                return subject;
+
+            } catch (Exception e) {
+                fail("Test Case should not encounter exception");
+            }
+
+            return null;
         }
     }
 
