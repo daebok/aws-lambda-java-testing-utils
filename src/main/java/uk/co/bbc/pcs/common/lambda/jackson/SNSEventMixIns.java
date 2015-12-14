@@ -3,19 +3,11 @@ package uk.co.bbc.pcs.common.lambda.jackson;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
 
 import java.util.Map;
 
 public class SNSEventMixIns {
-
-    public static void addMixIns(ObjectMapper objectMapper) {
-        objectMapper.addMixIn(SNSEvent.class, LambdaEventMixIns.LambdaEventMixIn.class);
-        objectMapper.addMixIn(SNSEvent.SNS.class, SNSMixIn.class);
-        objectMapper.addMixIn(SNSEvent.SNSRecord.class, SNSRecordMixIn.class);
-        objectMapper.addMixIn(SNSEvent.MessageAttribute.class, MessageAttributeMixIn.class);
-    }
 
     public static abstract class SNSRecordMixIn {
         @JsonIgnore public static final String EVENT_VERSION = "EventVersion";

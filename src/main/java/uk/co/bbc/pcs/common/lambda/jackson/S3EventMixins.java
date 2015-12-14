@@ -10,11 +10,6 @@ import java.util.List;
 
 public class S3EventMixins {
 
-    public static void addMixIns(ObjectMapper objectMapper) {
-        objectMapper.addMixIn(S3Event.class, S3EventMixin.class);
-        objectMapper.addMixIn(S3EventNotification.S3ObjectEntity.class, S3ObjectEntityMixIn.class);
-    }
-
     public static abstract class S3EventMixin {
         public S3EventMixin(@JsonProperty(LambdaEventMixIns.LambdaEventMixIn.RECORDS) List<S3EventNotification.S3EventNotificationRecord> records) { }
     }

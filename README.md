@@ -72,4 +72,7 @@ Context context = new MockContextBuilder("my-lambda-function-name")
 
 This is an extension of [ObjectMapper](https://fasterxml.github.io/jackson-databind/javadoc/2.5/com/fasterxml/jackson/databind/ObjectMapper.html)
 which can serialize and deserialize Lambda events. 
-Currently it will only handle `com.amazonaws.services.lambda.runtime.events.DynamodbEvent`.
+Currently it can handle:
+ - `com.amazonaws.services.lambda.runtime.events.DynamodbEvent`
+ - `com.amazonaws.services.lambda.runtime.events.S3Event`
+ - `com.amazonaws.services.lambda.runtime.events.SNSEvent`
