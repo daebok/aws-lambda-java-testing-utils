@@ -22,12 +22,23 @@ public class RequestHandlerForwarder implements RequestForwarder {
 
     private final RequestHandler requestHandler;
     private final Class<?> eventClass;
+    private final String lambdaFunctionName;
     private final ObjectMapper objectMapper;
 
     public RequestHandlerForwarder(RequestHandler requestHandler, Class<?> eventClass) {
         this.requestHandler = requestHandler;
         this.eventClass = eventClass;
+        this.lambdaFunctionName = null;
         logger.info("Got {} event type for request handler {}", eventClass, requestHandler);
+        objectMapper = new AwsLambdaEventsObjectMapper();
+    }
+
+    public RequestHandlerForwarder(RequestHandler requestHandler, Class<?> eventClass, String lambdaFunctionName) {
+        this.requestHandler = requestHandler;
+        this.eventClass = eventClass;
+        this.lambdaFunctionName = lambdaFunctionName;
+        logger.info("Got {} event type for request handler {} with function name {}",
+                eventClass, requestHandler, lambdaFunctionName);
         objectMapper = new AwsLambdaEventsObjectMapper();
     }
 
@@ -45,7 +56,10 @@ public class RequestHandlerForwarder implements RequestForwarder {
 
     @SuppressWarnings("unchecked")
     private String forwardToRequestHandler(Object request) throws JsonProcessingException {
-        Context context = new MockContextBuilder(requestHandler.getClass().getName(), logger::info)
+        final String functionName = (this.lambdaFunctionName == null || this.lambdaFunctionName.isEmpty()) ?
+                requestHandler.getClass().getName() :
+                this.lambdaFunctionName;
+        Context context = new MockContextBuilder(functionName, logger::info)
                 .createMockContext();
         Object response = requestHandler.handleRequest(request, context);
         return objectMapper.writeValueAsString(response);

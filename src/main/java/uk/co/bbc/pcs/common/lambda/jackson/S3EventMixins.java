@@ -13,6 +13,7 @@ public class S3EventMixins {
     public static void addMixIns(ObjectMapper objectMapper) {
         objectMapper.addMixIn(S3Event.class, S3EventMixin.class);
         objectMapper.addMixIn(S3EventNotification.S3ObjectEntity.class, S3ObjectEntityMixIn.class);
+        objectMapper.addMixIn(S3EventNotification.S3BucketEntity.class, S3BucketEntityMixIn.class);
     }
 
     public static abstract class S3EventMixin {
@@ -29,6 +30,15 @@ public class S3EventMixins {
                                    @JsonProperty(value = SIZE) Long size,
                                    @JsonProperty(value = ETAG) String eTag,
                                    @JsonProperty(value = SEQUENCER) String versionId) { }
+    }
+
+    public static abstract class S3BucketEntityMixIn {
+        @JsonIgnore public static final String ARN = "arn";
+        @JsonIgnore public static final String NAME = "name";
+        @JsonIgnore public static final String OWNER = "ownerIdentity";
+
+        public S3BucketEntityMixIn(@JsonProperty(value = ARN) String arn,
+                                   @JsonProperty(value = NAME) String name){}
     }
 
 }
