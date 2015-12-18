@@ -26,7 +26,11 @@ public class AwsLambdaRunner {
         String eventClassName = args[1];
         Class<?> eventClass = ReflectionUtils.resolveClass(eventClassName);
 
-        startServer(requestHandler, eventClass);
+        if(args.length == 3) {
+            startServer(requestHandler, eventClass, args[2]);
+        } else {
+            startServer(requestHandler, eventClass, null);
+        }
     }
 
     public static void stopServer() {
@@ -35,8 +39,8 @@ public class AwsLambdaRunner {
         }
     }
 
-    public static void startServer(RequestHandler requestHandler, Class<?> eventClass) {
-        RequestForwarder requestForwarder = new RequestHandlerForwarder(requestHandler, eventClass);
+    public static void startServer(RequestHandler requestHandler, Class<?> eventClass, String lambdaFunctionName) {
+        RequestForwarder requestForwarder = new RequestHandlerForwarder(requestHandler, eventClass, lambdaFunctionName);
         startServer(requestForwarder);
     }
 

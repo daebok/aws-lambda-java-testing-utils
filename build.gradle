@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'maven'
     id 'net.researchgate.release' version '2.2.2'
+    id 'idea'
 }
 
 archivesBaseName = 'aws-lambda-java-testing-utils'

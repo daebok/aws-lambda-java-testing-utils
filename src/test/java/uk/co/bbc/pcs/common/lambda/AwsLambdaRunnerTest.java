@@ -97,7 +97,7 @@ public class AwsLambdaRunnerTest {
 
     @Test
     public void mainShouldForwardToDynamoDbEventRequestHandlerWhenStartedFromJava() throws IOException {
-        AwsLambdaRunner.startServer(new DynamodbMockHandler(), DynamodbEvent.class);
+        AwsLambdaRunner.startServer(new DynamodbMockHandler(), DynamodbEvent.class, null);
 
         given()
                 .port(PORT)
@@ -111,7 +111,7 @@ public class AwsLambdaRunnerTest {
 
     @Test
     public void mainShouldForwardToSnsEventRequestHandlerWhenStartedFromJava() throws IOException {
-        AwsLambdaRunner.startServer(new SNSMockHandler(), SNSEvent.class);
+        AwsLambdaRunner.startServer(new SNSMockHandler(), SNSEvent.class, null);
 
         given()
                 .port(PORT)
@@ -126,7 +126,7 @@ public class AwsLambdaRunnerTest {
 
     @Test
     public void mainShouldForwardToSesEventRequestHandlerWhenStartedFromJava() throws IOException {
-        AwsLambdaRunner.startServer(new SESMockHandler(), LinkedHashMap.class);
+        AwsLambdaRunner.startServer(new SESMockHandler(), LinkedHashMap.class, null);
 
         String subject = "Test Subject";
         String sesEvent = readFile("/ses-event.json").replaceAll("%%SUBJECT%%", subject);
@@ -144,7 +144,7 @@ public class AwsLambdaRunnerTest {
 
     @Test
     public void mainShouldForwardToS3EventRequestHandlerWhenStartedFromJava() throws IOException {
-        AwsLambdaRunner.startServer(new S3MockHandler(), S3Event.class);
+        AwsLambdaRunner.startServer(new S3MockHandler(), S3Event.class, null);
 
         given()
                 .port(PORT)

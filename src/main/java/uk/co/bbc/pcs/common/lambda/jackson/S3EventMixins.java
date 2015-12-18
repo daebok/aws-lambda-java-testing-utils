@@ -26,4 +26,13 @@ public class S3EventMixins {
                                    @JsonProperty(value = SEQUENCER) String versionId) { }
     }
 
+    public static abstract class S3BucketEntityMixIn {
+        @JsonIgnore public static final String ARN = "arn";
+        @JsonIgnore public static final String NAME = "name";
+        @JsonIgnore public static final String OWNER = "ownerIdentity";
+
+        public S3BucketEntityMixIn(@JsonProperty(value = ARN) String arn,
+                                   @JsonProperty(value = NAME) String name){}
+    }
+
 }

@@ -35,6 +35,7 @@ public class LambdaEventsModule extends Module {
         // S3
         setupContext.setMixInAnnotations(S3Event.class, S3EventMixins.S3EventMixin.class);
         setupContext.setMixInAnnotations(S3EventNotification.S3ObjectEntity.class, S3EventMixins.S3ObjectEntityMixIn.class);
+        setupContext.setMixInAnnotations(S3EventNotification.S3BucketEntity.class, S3EventMixins.S3BucketEntityMixIn.class);
 
         // SNS
         setupContext.setMixInAnnotations(SNSEvent.class, LambdaEventMixIns.LambdaEventMixIn.class);
