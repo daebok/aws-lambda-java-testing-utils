@@ -1,24 +1,14 @@
 package uk.co.bbc.pcs.common.lambda.jackson;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.Record;
 import com.amazonaws.services.dynamodbv2.model.StreamRecord;
 import com.amazonaws.services.dynamodbv2.model.StreamViewType;
-import com.amazonaws.services.lambda.runtime.events.DynamodbEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
 public class DynamodbEventMixIns {
-
-    public static void addMixIns(ObjectMapper objectMapper) {
-        objectMapper.addMixIn(DynamodbEvent.class, LambdaEventMixIns.LambdaEventMixIn.class);
-        objectMapper.addMixIn(AttributeValue.class, LambdaEventMixIns.AttributeValueMixIn.class);
-        objectMapper.addMixIn(Record.class, RecordMixIn.class);
-        objectMapper.addMixIn(StreamRecord.class, StreamRecordMixIn.class);
-    }
 
     public static abstract class RecordMixIn {
         @JsonIgnore public static final String EVENT_VERSION = "eventVersion";

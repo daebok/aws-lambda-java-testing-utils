@@ -25,14 +25,6 @@ public class RequestHandlerForwarder implements RequestForwarder {
     private final String lambdaFunctionName;
     private final ObjectMapper objectMapper;
 
-    public RequestHandlerForwarder(RequestHandler requestHandler, Class<?> eventClass) {
-        this.requestHandler = requestHandler;
-        this.eventClass = eventClass;
-        this.lambdaFunctionName = null;
-        logger.info("Got {} event type for request handler {}", eventClass, requestHandler);
-        objectMapper = new AwsLambdaEventsObjectMapper();
-    }
-
     public RequestHandlerForwarder(RequestHandler requestHandler, Class<?> eventClass, String lambdaFunctionName) {
         this.requestHandler = requestHandler;
         this.eventClass = eventClass;

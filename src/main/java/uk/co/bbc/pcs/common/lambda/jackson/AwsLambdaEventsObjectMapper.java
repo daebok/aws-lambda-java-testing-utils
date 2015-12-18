@@ -18,11 +18,6 @@ public class AwsLambdaEventsObjectMapper extends ObjectMapper {
         this.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         this.registerModule(new JodaModule());
-
-        // Adds MixIns for Lambda event objects
-        // See http://wiki.fasterxml.com/JacksonMixInAnnotations for details about MixIns.
-        DynamodbEventMixIns.addMixIns(this);
-        SNSEventMixIns.addMixIns(this);
-        S3EventMixins.addMixIns(this);
+        this.registerModule(new LambdaEventsModule());
     }
 }
