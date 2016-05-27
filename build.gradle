@@ -18,7 +18,7 @@ targetCompatibility = 1.8
 project.ext {
     slf4jVersion = "1.7.12"
     awsLambdaJavaCoreVersion = "1.0.0"
-    awsLambdaJavaEventsVersion = "1.1.0"
+    awsLambdaJavaEventsVersion = "1.3.0"
     jacksonVersion = "2.6.2"
 }
 

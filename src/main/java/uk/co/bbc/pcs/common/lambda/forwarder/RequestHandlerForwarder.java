@@ -2,7 +2,6 @@ package uk.co.bbc.pcs.common.lambda.forwarder;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.util.json.JSONException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -57,7 +56,7 @@ public class RequestHandlerForwarder implements RequestForwarder {
         return objectMapper.writeValueAsString(response);
     }
 
-    private Object parseRequestBody(String rawRequestBody) throws JSONException, IOException {
+    private Object parseRequestBody(String rawRequestBody) throws IOException {
         return objectMapper.readValue(rawRequestBody, objectMapper.getTypeFactory().constructType(eventClass));
     }
 
