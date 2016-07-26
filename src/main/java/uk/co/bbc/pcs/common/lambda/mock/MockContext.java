@@ -6,6 +6,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.google.common.base.Preconditions;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MockContext implements Context {
 
     private final String awsRequestId;
@@ -14,9 +17,12 @@ public class MockContext implements Context {
     private final String functionName;
     private final CognitoIdentity identity;
     private final ClientContext clientContext;
-    private final int remainingTimeInMillis;
     private final int memoryLimitInMB;
     private final LambdaLogger logger;
+
+    private int remainingTimeInMillis;
+    private boolean remainingTimeDoesCountdown = false;
+    private Timer timer = null;
 
     MockContext(String awsRequestId,
                 String logGroupName,
@@ -41,6 +47,35 @@ public class MockContext implements Context {
         this.remainingTimeInMillis = remainingTimeInMillis;
         this.memoryLimitInMB = memoryLimitInMB;
         this.logger = logger;
+    }
+
+    MockContext(String awsRequestId,
+                String logGroupName,
+                String logStreamName,
+                String functionName,
+                CognitoIdentity identity,
+                ClientContext clientContext,
+                int remainingTimeInMillis,
+                int memoryLimitInMB,
+                LambdaLogger logger,
+                boolean remainingTimeDoesCountdown) {
+        this(awsRequestId, logGroupName, logStreamName, functionName, identity, clientContext, remainingTimeInMillis, memoryLimitInMB, logger);
+        this.remainingTimeDoesCountdown = remainingTimeDoesCountdown;
+
+        if (this.remainingTimeDoesCountdown) {
+            timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    if (MockContext.this.remainingTimeInMillis >= 1000) {
+                        MockContext.this.remainingTimeInMillis -= 1000;
+                    } else {
+                        MockContext.this.remainingTimeInMillis = 0;
+                        timer.cancel();
+                    }
+                }
+            }, 0, 1000);
+        }
     }
 
     @Override

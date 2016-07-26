@@ -17,6 +17,7 @@ public class MockContextBuilder {
     private ClientContext clientContext;
     private int remainingTimeInMillis = 0;
     private int memoryLimitInMB = 0;
+    private boolean remainingTimeDoesCountdown;
 
     public MockContextBuilder(String functionName) {
         this.functionName = functionName;
@@ -61,8 +62,13 @@ public class MockContextBuilder {
         return this;
     }
 
+    public MockContextBuilder withRemainingTimeCountdown(boolean remainingTimeDoesCountdown) {
+        this.remainingTimeDoesCountdown = remainingTimeDoesCountdown;
+        return this;
+    }
+
     public MockContext createMockContext() {
         return new MockContext(awsRequestId, logGroupName, logStreamName, functionName, identity,
-                clientContext, remainingTimeInMillis, memoryLimitInMB, logger);
+                clientContext, remainingTimeInMillis, memoryLimitInMB, logger, remainingTimeDoesCountdown);
     }
 }
