@@ -17,6 +17,7 @@ import java.util.Optional;
  */
 public class RequestHandlerForwarder implements RequestForwarder {
 
+    private static final int MOCK_EXECUTION_TIME_LIMIT = 60000;
     private static Logger logger = LoggerFactory.getLogger(RequestHandlerForwarder.class);
 
     private final RequestHandler requestHandler;
@@ -29,7 +30,7 @@ public class RequestHandlerForwarder implements RequestForwarder {
         this.eventClass = eventClass;
         this.lambdaFunctionName = lambdaFunctionName;
         logger.info("Got {} event type for request handler {} with function name {}",
-                eventClass, requestHandler, lambdaFunctionName);
+                    eventClass, requestHandler, lambdaFunctionName);
         objectMapper = new AwsLambdaEventsObjectMapper();
     }
 
@@ -48,9 +49,11 @@ public class RequestHandlerForwarder implements RequestForwarder {
     @SuppressWarnings("unchecked")
     private String forwardToRequestHandler(Object request) throws JsonProcessingException {
         final String functionName = (this.lambdaFunctionName == null || this.lambdaFunctionName.isEmpty()) ?
-                requestHandler.getClass().getName() :
-                this.lambdaFunctionName;
+                                    requestHandler.getClass().getName() :
+                                    this.lambdaFunctionName;
         Context context = new MockContextBuilder(functionName, logger::info)
+                .withRemainingTimeInMillis(MOCK_EXECUTION_TIME_LIMIT)
+                .withRemainingTimeCountdown(true)
                 .createMockContext();
         Object response = requestHandler.handleRequest(request, context);
         return objectMapper.writeValueAsString(response);
